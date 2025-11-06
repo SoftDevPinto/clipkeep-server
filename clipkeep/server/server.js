@@ -9,19 +9,29 @@ app.use(express.json());
 app.get("/", (req, res) => res.send("ClipKeep backend is running ✅"));
 
 app.post("/download", async (req, res) => {
-  const { url } = req.body;
-  if (!url) return res.status(400).send("Missing URL");
   try {
-    // Your working fetch-based downloader here
-    const remote = await fetch(/* your working endpoint using url */);
-    if (!remote.ok) throw new Error("Failed to fetch video");
-    const buf = Buffer.from(await remote.arrayBuffer());
+    const { url } = req.body;
+    if (!url) return res.status(400).send("Missing video URL");
+
+    console.log("Fetching TikTok video:", url);
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+
+    console.log("Response status:", response.status);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch TikTok video (status ${response.status})`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
     res.setHeader("Content-Type", "video/mp4");
-    res.setHeader("Content-Disposition", "attachment; filename=clipkeep_video.mp4");
-    res.send(buf);
-  } catch (e) {
-    console.error(e);
-    res.status(500).send("Download failed: " + e.message);
+    res.send(Buffer.from(arrayBuffer));
+  } catch (error) {
+    console.error("❌ Download error:", error.message);
+    res.status(500).send("Error downloading video.");
   }
 });
 
