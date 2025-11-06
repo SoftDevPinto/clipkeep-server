@@ -3,10 +3,22 @@ import cors from "cors";
 import fetch from "node-fetch";
 
 const app = express();
-app.use(cors({ origin: "*"})); // later: lock to your frontend domain
+
+// ✅ Proper CORS configuration
+app.use(
+  cors({
+    origin: [
+      "https://clipkeeper.netlify.app", // your live frontend
+      "http://localhost:5173"           // local dev
+    ],
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 app.use(express.json());
 
-app.get("/", (req, res) => res.send("ClipKeep backend is running ✅"));
+app.get("/", (req, res) => res.send("✅ ClipKeep backend is running!"));
 
 app.post("/download", async (req, res) => {
   try {
