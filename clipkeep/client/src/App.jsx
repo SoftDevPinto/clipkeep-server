@@ -54,7 +54,8 @@ export default function App() {
       </header>
 
             {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center text-center px-6">
+      <main className="flex-1 flex flex-col items-center justify-center text-center px-6 pt-20 sm:pt-28">
+
         <div className="max-w-lg w-full bg-white shadow-lg rounded-3xl p-8 border border-gray-100">
           <h2 className="text-3xl font-semibold text-gray-900 mb-3">
             Download TikTok Videos
