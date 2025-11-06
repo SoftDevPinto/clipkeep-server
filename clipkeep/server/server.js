@@ -11,9 +11,14 @@ app.get("/", (req, res) => res.send("ClipKeep backend is running ✅"));
 app.post("/download", async (req, res) => {
   try {
     const { url } = req.body;
-    if (!url) return res.status(400).send("Missing video URL");
 
-    console.log("Fetching TikTok video:", url);
+    if (!url) {
+      console.error("❌ No URL received in request body:", req.body);
+      return res.status(400).send("Missing video URL");
+    }
+
+    console.log("⬇️ Download request received for:", url);
+
     const response = await fetch(url, {
       headers: {
         "User-Agent":
@@ -22,9 +27,8 @@ app.post("/download", async (req, res) => {
     });
 
     console.log("Response status:", response.status);
-    if (!response.ok) {
+    if (!response.ok)
       throw new Error(`Failed to fetch TikTok video (status ${response.status})`);
-    }
 
     const arrayBuffer = await response.arrayBuffer();
     res.setHeader("Content-Type", "video/mp4");
