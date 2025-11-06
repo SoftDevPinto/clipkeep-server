@@ -5,13 +5,20 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [log, setLog] = useState("");
 
-  const handleSubmit = async (e) => {
+  // ✅ Add this just above handleSubmit
+  const API_BASE = import.meta.env.PROD
+    ? "https://clipkeep.onrender.com"
+    : "http://localhost:5000";
+
+
+   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!url.trim()) return;
     setLoading(true);
     setLog("Downloading video...");
     try {
-      const res = await fetch("https://clipkeep-server.onrender.com/download", {
+      // ✅ Use API_BASE dynamically
+      const res = await fetch(`${API_BASE}/download`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
