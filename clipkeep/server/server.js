@@ -27,31 +27,43 @@ app.post("/download", async (req, res) => {
 
     console.log("🎬 Fetching TikTok metadata for:", url);
 
-    // Fetch metadata from TikWM
     const metaResponse = await fetch("https://www.tikwm.com/api/", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ url }),
     });
 
-    const metaData = await metaResponse.json();
+    const text = await metaResponse.text();
+    console.log("🧾 TikWM response (first 500 chars):", text.slice(0, 500));
+
+    let metaData;
+    try {
+      metaData = JSON.parse(text);
+    } catch {
+      console.error("❌ Could not parse TikWM JSON");
+      return res.status(500).send("Invalid TikWM API response.");
+    }
+
     const videoUrl = metaData?.data?.play;
-    if (!videoUrl) throw new Error("No playable video found");
+    if (!videoUrl) {
+      console.error("❌ TikWM returned no playable video link.");
+      return res.status(500).send("TikWM returned no playable video link.");
+    }
 
     console.log("🎥 Direct video URL:", videoUrl);
 
-    // Follow redirects and request as a stream
+    // Download video
     const videoResponse = await fetch(videoUrl, { redirect: "follow" });
     const contentType = videoResponse.headers.get("content-type");
+    console.log("📦 Video response type:", contentType);
 
-    // Check for actual video content
     if (!contentType || !contentType.includes("video")) {
-      const text = await videoResponse.text();
-      console.error("❌ Not a video response, got:", text.slice(0, 200));
-      return res.status(500).send("Video URL returned invalid content.");
+      const bodyText = await videoResponse.text();
+      console.error("❌ Invalid content (first 500 chars):", bodyText.slice(0, 500));
+      return res.status(500).send("Video link did not return valid MP4.");
     }
 
-    // Stream video to browser
+    // Stream to client
     res.setHeader("Content-Type", "video/mp4");
     res.setHeader(
       "Content-Disposition",
@@ -64,6 +76,7 @@ app.post("/download", async (req, res) => {
     res.status(500).send("Error downloading video.");
   }
 });
+
 
 
 
