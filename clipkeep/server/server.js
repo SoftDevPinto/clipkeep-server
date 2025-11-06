@@ -25,32 +25,40 @@ app.post("/download", async (req, res) => {
     const { url } = req.body;
     if (!url) return res.status(400).send("Missing video URL");
 
-    console.log("Fetching TikTok metadata for:", url);
+    console.log("🎬 Fetching TikTok video metadata:", url);
 
-    // TikWM API gives the real video URL (no watermark)
-    const api = await fetch("https://www.tikwm.com/api/", {
+    // Use TikWM API to get the playable MP4 link
+    const metaResponse = await fetch("https://www.tikwm.com/api/", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ url }),
     });
 
-    const data = await api.json();
-    if (!data?.data?.play) throw new Error("No playable video found");
+    const metaData = await metaResponse.json();
+    if (!metaData?.data?.play) throw new Error("No playable video found");
 
-    const videoUrl = data.data.play;
-    console.log("Downloading video from:", videoUrl);
+    const videoUrl = metaData.data.play;
+    console.log("🎥 Direct video URL:", videoUrl);
 
-    const video = await fetch(videoUrl);
-    const buffer = Buffer.from(await video.arrayBuffer());
+    // Stream the file to the browser instead of loading it fully in memory
+    const videoResponse = await fetch(videoUrl);
+    if (!videoResponse.ok)
+      throw new Error(`Video fetch failed (${videoResponse.status})`);
 
     res.setHeader("Content-Type", "video/mp4");
-    res.setHeader("Content-Disposition", 'attachment; filename="clipkeep_video.mp4"');
-    res.send(buffer);
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="clipkeep_video.mp4"'
+    );
+
+    // ✅ Stream the response directly — avoids corruption
+    videoResponse.body.pipe(res);
   } catch (error) {
     console.error("❌ Download error:", error.message);
     res.status(500).send("Error downloading video.");
   }
 });
+
 
 
 const PORT = process.env.PORT || 5000;
