@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* --- Global resets and defaults --- */
+/* Smooth transitions */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Light mode defaults */
 html, body, #root {
   height: 100%;
   width: 100%;
@@ -11,5 +16,28 @@ html, body, #root {
 }
 
 body {
-  @apply bg-gray-100 text-gray-800 font-sans;
+  @apply bg-gray-50 text-gray-800 font-sans;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    @apply bg-gray-900 text-gray-100;
+  }
+
+  .card {
+    @apply bg-gray-800 border-gray-700;
+  }
+
+  .input {
+    @apply bg-gray-800 text-gray-100 border-gray-600;
+  }
+
+  .btn {
+    @apply bg-gradient-to-r from-blue-500 to-indigo-500 text-white;
+  }
+
+  footer {
+    @apply bg-gray-800 border-gray-700 text-gray-400;
+  }
 }
