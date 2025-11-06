@@ -16,15 +16,13 @@ app.use(express.json());
 
 app.get("/", (req, res) => res.send("ClipKeep backend is running ✅"));
 
-// ✅ TikTok video downloader using tikwm.com API
 app.post("/download", async (req, res) => {
   try {
     const { url } = req.body;
     if (!url) return res.status(400).send("Missing video URL");
 
-    console.log("🎬 Fetching TikTok metadata for:", url);
+    console.log("🎬 Download requested for:", url);
 
-    // TikWM API request (no API key required)
     const apiRes = await fetch("https://www.tikwm.com/api/", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -32,26 +30,45 @@ app.post("/download", async (req, res) => {
     });
 
     const data = await apiRes.json();
-    console.log("🧾 TikWM response:", data);
+    console.log("🧾 TikWM response (short):", {
+      success: data.code === 0,
+      videoUrl: data?.data?.play,
+      wmUrl: data?.data?.wmplay,
+    });
 
-    if (!data.data || !data.data.play) {
-      throw new Error("No valid download link returned");
+    if (!data.data?.play) {
+      console.error("⚠️ No valid video URL in TikWM response");
+      return res.status(400).send("Invalid TikTok URL or private video");
     }
 
-    // Fetch the actual MP4 file
     const videoUrl = data.data.play;
-    console.log("🎥 Direct video URL:", videoUrl);
+    console.log("🎥 Fetching actual MP4 from:", videoUrl);
 
     const videoRes = await fetch(videoUrl);
+    console.log("🎥 Video response headers:", Object.fromEntries(videoRes.headers));
+
+    if (!videoRes.ok) {
+      console.error("❌ Video fetch failed:", videoRes.statusText);
+      return res.status(500).send("Failed to fetch MP4");
+    }
+
     const arrayBuffer = await videoRes.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    console.log("✅ Downloaded video bytes:", buffer.length);
+
+    if (buffer.length < 50000) {
+      console.warn("⚠️ Video too small; likely invalid file");
+    }
 
     res.setHeader("Content-Type", "video/mp4");
-    res.send(Buffer.from(arrayBuffer));
+    res.send(buffer);
   } catch (err) {
     console.error("❌ Error:", err.message);
     res.status(500).send("Error downloading video.");
   }
 });
+
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`✅ Server running on ${PORT}`));
