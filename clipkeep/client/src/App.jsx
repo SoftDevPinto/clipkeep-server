@@ -380,12 +380,21 @@ useEffect(() => {
     </motion.div>
   )}
 </AnimatePresence>
-
-      {/* Footer */}
-      <footer className="w-full py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-center text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
-
-        Built by <span className="font-semibold text-gray-700">Pinto</span>
-      </footer>
+{/* Footer */}
+<footer className="w-full py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-center text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
+  <p>
+    Built by <span className="font-semibold text-gray-700 dark:text-gray-300">Pinto</span> •{" "}
+    <a
+      href="mailto:clipkeephelp@gmail.com"
+      className="text-blue-600 dark:text-blue-400 hover:underline"
+    >
+      Contact Support
+    </a>
+  </p>
+  <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+    © {new Date().getFullYear()} ClipKeep. All rights reserved.
+  </p>
+</footer>
     </div>
   );
 }
