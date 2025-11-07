@@ -144,6 +144,36 @@ useEffect(() => {
   };
 }, []);
 
+// 🧩 Load Ad after videoInfo changes
+useEffect(() => {
+  if (!videoInfo) return; // only run after video loads
+
+  const container = document.getElementById("adsterra-banner-300x250");
+  if (!container) return;
+
+  // Inline ad setup
+  const setupScript = document.createElement("script");
+  setupScript.innerHTML = `
+    atOptions = {
+      'key': '9cdabcab43ba9ae9e5ade9cf1b41856b',
+      'format': 'iframe',
+      'height': 250,
+      'width': 300,
+      'params': {}
+    };
+  `;
+  container.appendChild(setupScript);
+
+  // External script
+  const adScript = document.createElement("script");
+  adScript.src =
+    "//www.highperformanceformat.com/9cdabcab43ba9ae9e5ade9cf1b41856b/invoke.js";
+  container.appendChild(adScript);
+
+  return () => {
+    container.innerHTML = "";
+  };
+}, [videoInfo]);
 
   
   return (
