@@ -100,16 +100,48 @@ fetch(`${API_BASE}/stats`)
 
 
 
-// ✅ Load Ad Script once on mount
+// ✅ Load Ad Scripts once on mount
 useEffect(() => {
-  const script = document.createElement("script");
-  script.async = true;
-  script.setAttribute("data-cfasync", "false");
-  script.src =
+  // --- 1️⃣ Native Banner (bottom ad) ---
+  const nativeScript = document.createElement("script");
+  nativeScript.async = true;
+  nativeScript.setAttribute("data-cfasync", "false");
+  nativeScript.src =
     "//pl28005821.effectivegatecpm.com/a34618341809999ade3e956b7587ae82/invoke.js";
-  document.body.appendChild(script);
+  document.body.appendChild(nativeScript);
 
-  return () => script.remove(); // cleanup on unmount
+  // --- 2️⃣ Banner (300x250) under Download button ---
+  const bannerContainer = document.getElementById("adsterra-banner-300x250");
+  if (bannerContainer) {
+    // Inline ad setup script (defines atOptions)
+    const bannerSetup = document.createElement("script");
+    bannerSetup.type = "text/javascript";
+    bannerSetup.innerHTML = `
+      atOptions = {
+        'key': '9cdabcab43ba9ae9e5ade9cf1b41856b',
+        'format': 'iframe',
+        'height': 250,
+        'width': 300,
+        'params': {}
+      };
+    `;
+    bannerContainer.appendChild(bannerSetup);
+
+    // External ad script loader
+    const bannerScript = document.createElement("script");
+    bannerScript.type = "text/javascript";
+    bannerScript.src = "//www.highperformanceformat.com/9cdabcab43ba9ae9e5ade9cf1b41856b/invoke.js";
+    bannerContainer.appendChild(bannerScript);
+  }
+
+  // 🧹 Cleanup: remove scripts when component unmounts
+  return () => {
+    document
+      .querySelectorAll(
+        "script[src*='effectivegatecpm'], script[src*='highperformanceformat']"
+      )
+      .forEach((el) => el.remove());
+  };
 }, []);
 
 
@@ -252,6 +284,10 @@ useEffect(() => {
         Copy Caption
       </button>
     </div>
+    {/* 🧩 Adsterra Banner (300x250) below download buttons */}
+<div className="my-6 w-full flex justify-center">
+  <div id="adsterra-banner-300x250"></div>
+</div>
   </div>
 )}
           </div>
