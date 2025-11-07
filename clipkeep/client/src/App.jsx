@@ -175,16 +175,7 @@ useEffect(() => {
   };
 }, [videoInfo]);
 
-// 🧲 Optional Social Bar (bottom-left, non-intrusive)
-const socialBarScript = document.createElement("script");
-socialBarScript.type = "text/javascript";
-socialBarScript.src = "//pl28006044.effectivegatecpm.com/42/9f/8c/429f8cf2c4eeb3e57eabdc9d382bb9b9.js";
-document.body.appendChild(socialBarScript);
 
-// 🧹 Cleanup on unmount
-return () => {
-  document.querySelectorAll("script[src*='effectivegatecpm']").forEach(el => el.remove());
-};
 
   
   return (
