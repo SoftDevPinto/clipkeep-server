@@ -14,6 +14,10 @@ const [downloadCount, setDownloadCount] = useState(0);
 
 );
 
+const API_BASE = import.meta.env.PROD
+  ? "https://clipkeep.onrender.com"
+  : "http://localhost:10000";
+
 // 📡 Fetch global download count from backend
 useEffect(() => {
   fetch(`${API_BASE}/stats`)
@@ -30,9 +34,7 @@ useEffect(() => {
   }
   localStorage.setItem("theme", darkMode ? "dark" : "light");
 }, [darkMode]);
-  const API_BASE = import.meta.env.PROD
-    ? "https://clipkeep.onrender.com"
-    : "http://localhost:10000";
+  
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -98,17 +100,17 @@ fetch(`${API_BASE}/stats`)
 
 
 
-  // ✅ Load Ad Script once on mount
-  useEffect(() => {
+// ✅ Load Ad Script once on mount
+useEffect(() => {
+  const script = document.createElement("script");
+  script.async = true;
+  script.setAttribute("data-cfasync", "false");
+  script.src =
+    "//pl28005821.effectivegatecpm.com/a34618341809999ade3e956b7587ae82/invoke.js";
+  document.body.appendChild(script);
 
-    
-    const script = document.createElement("script");
-    script.async = true;
-    script.setAttribute("data-cfasync", "false");
-    script.src =
-      "//pl28001066.effectivetagetcpm.com/8b570539cb21f267938557efb4d7cb1a/invoke.js";
-    document.body.appendChild(script);
-  }, []);
+  return () => script.remove(); // cleanup on unmount
+}, []);
 
 
   
@@ -288,10 +290,12 @@ fetch(`${API_BASE}/stats`)
 
 
         {/* 🧩 Native Banner Ad (below content, above footer) */}
-        <div
-          id="container-8b570539cb21f267938557efb4d7cb1a"
-          className="my-10"
-        ></div>
+      {/* 🧩 Native Banner Ad (below content, above footer) */}
+<div
+  id="container-a34618341809999ade3e956b7587ae82"
+  className="my-10"
+></div>
+
       </main>
 
       {/* ✅ Toast Notification */}
