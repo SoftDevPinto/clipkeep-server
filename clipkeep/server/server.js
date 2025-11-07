@@ -11,11 +11,16 @@ if (!fs.existsSync(COUNTER_FILE)) {
 const app = express();
 app.use(
   cors({
-    origin: ["https://clipkeeper.netlify.app", "http://localhost:5173"],
+    origin: [
+      "https://clipkeeper.netlify.app",
+      "https://clipkeep.live", // ✅ your new domain
+      "http://localhost:5173"
+    ],
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
 );
+
 app.use(express.json());
 
 app.get("/", (req, res) => res.send("ClipKeep backend is running ✅"));
